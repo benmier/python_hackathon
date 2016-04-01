@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Facebook Login</title>
+<link rel="stylesheet" href="style2.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<meta charset="UTF-8">
+</head>
+<body style = "background-color:#00b4ff;">
+
+<img src="file:///C:\Users\Ben\Google Drive\Hacakthon/bellologo.png" alt="logo">
+  <div id="background-wrap">
+    <div class="x1">
+        <div class="cloud"></div>
+    </div>
+
+    <div class="x2">
+        <div class="cloud"></div>
+    </div>
+
+    <div class="x3">
+        <div class="cloud"></div>
+    </div>
+
+    <div class="x4">
+        <div class="cloud"></div>
+    </div>
+
+    <div class="x5">
+        <div class="cloud"></div>
+    </div>
+  </div>
+
+
+
+<appSettings>
+  <add key="aspnet:MaxJsonDeserializerMembers" value="150000" />
+</appSettings>
+<script>
+  function statusChangeCallback(response) {
+    if (response.status === 'connected') {
+  //     var token = response.authResponse.accessToken;
+  //     var url = "https://graph.facebook.com/v2.5/me?access_token="+token+"&fields=id,name,location,likes";
+		// $.get(url, function(data){
+		// 	var likes = [];
+		// 	for(i in data.likes.data){
+		// 		likes.push({name:data.likes.data[i].name});
+		// 	}
+  //     // console.log(likes)
+		// 	jQuery.ajax({
+  //           type: "POST",
+  //           url: "/create",
+  //           data: likes,
+  //           success: function (data) { window.location = '/show' },
+  //           failure: function (errMsg) {alert(errMsg);}
+  //       	})
+
+		// },'json');
+		
+      testAPI();
+    } else if (response.status === 'not_authorized') {
+      document.getElementById('status').innerHTML = 'Please log ' +
+        'into this app.';
+    } else {
+      document.getElementById('status').innerHTML = 'Please log ' +
+        'into Facebook.';
+    }
+  }
+
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  }
+
+  window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '255707264767712',
+    cookie     : true,
+    xfbml      : true, 
+    version    : 'v2.5' 
+  });
+  FB.getLoginStatus(function(response) {
+    statusChangeCallback(response);
+  });
+  };
+
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+
+  function get_likes(response){
+    var likes = [];
+    // console.log(likes)
+    for(i in response.data){
+              likes.push({"name":response.data[i].name});
+              // console.log(response.data[i].name)
+            }
+
+            jQuery.ajax({
+                type: "POST",
+                url: "/create",
+                data: likes,
+                success: function (data) { },
+                failure: function (errMsg) {alert(errMsg);}
+              })
+    if(response.paging){
+        $.get(
+          response.paging.next,
+          function(response2){
+            get_likes(response2)
+          }
+        ,'json')
+      }
+  }
+
+  function testAPI() {
+    FB.api('/me/likes', {"limit":"10000"}, function(response) {
+        // var p1 = new Promise(
+        // function(resolve, reject) {
+          // console.log(response.data)
+            get_likes(response);
+            // resolve()
+        // })
+        // p1.then(function(){
+        //   console.log("BOMB")
+        // }, function(){
+        //   console.log("error")
+        // })
+      
+    });
+  }
+</script>
+<fb:login-button scope="public_profile,email,user_likes" onlogin="checkLoginState();">
+</fb:login-button>
+<div id="info">
+</div>
+</body>
+</html>
